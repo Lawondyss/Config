@@ -1,0 +1,28 @@
+{
+  "name": "lawondyss/config",
+  "description": "Base class for creating own class of configuration. Better than a associative array :-)",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Ladislav Vondráček",
+      "email": "lad.von@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.1"
+  },
+  "require-dev": {
+    "nette/tester": "^2.3",
+    "tracy/tracy": "^2.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "Lawondyss\\Config\\": "src/Config"
+    },
+    "files": ["src/Config/exceptions.php"]
+  },
+  "scripts": {
+    "tests": "tester tests/"
+  }
+}
