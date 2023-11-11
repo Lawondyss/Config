@@ -3,6 +3,7 @@
   "description": "Base class for creating own class of configuration. Better than a associative array :-)",
   "type": "library",
   "license": "MIT",
+  "version": "2.0.0",
   "authors": [
     {
       "name": "Ladislav Vondráček",
@@ -10,17 +11,16 @@
     }
   ],
   "require": {
-    "php": ">=7.1"
+    "php": ">=8.0"
   },
   "require-dev": {
-    "nette/tester": "^2.3",
-    "tracy/tracy": "^2.7"
+    "nette/tester": "^2.5",
+    "tracy/tracy": "^2.10"
   },
   "autoload": {
     "psr-4": {
       "Lawondyss\\Config\\": "src/Config"
-    },
-    "files": ["src/Config/exceptions.php"]
+    }
   },
   "scripts": {
     "tests": "tester tests/"

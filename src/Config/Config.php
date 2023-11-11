@@ -5,7 +5,18 @@
 
 namespace Lawondyss\Config;
 
-abstract class Config implements \ArrayAccess, \Countable, \IteratorAggregate
+use ArrayAccess;
+use Countable;
+use IteratorAggregate;
+use RecursiveArrayIterator;
+use ReflectionObject;
+use ReflectionProperty;
+use function array_map;
+use function count;
+use function is_array;
+use function property_exists;
+
+abstract class Config implements ArrayAccess, Countable, IteratorAggregate
 {
   /**
    * @param array<string, mixed> $options
@@ -30,17 +41,14 @@ abstract class Config implements \ArrayAccess, \Countable, \IteratorAggregate
   {
     $arr = [];
     $properties = $this->getProperties();
+
     foreach ($properties as $name) {
       $value = $this->$name;
 
       if ($value instanceof self) {
         $value = $value->toArray();
-      } elseif (is_array($value) && count($value) === count(array_filter($value, function($item) {
-            return $item instanceof self;
-          }))) {
-        $value = array_map(function(Config $item) {
-          return $item->toArray();
-        }, $value);
+      } elseif (is_array($value)) {
+        $value = array_map(fn(mixed $val) => $val instanceof Config ? $val->toArray() : $val, $value);
       }
 
       $arr[$name] = $value;
@@ -57,67 +65,60 @@ abstract class Config implements \ArrayAccess, \Countable, \IteratorAggregate
   public function withOptions(array $options): Config
   {
     $dolly = clone $this;
-    foreach ($options as $option => $value) {
-      $dolly->$option = $value;
+
+    foreach ($options as $name => $value) {
+      $dolly->$name = $value;
     }
 
     return $dolly;
   }
 
 
-  public function offsetExists($offset)
+  public function offsetExists($offset): bool
   {
-    return property_exists(static::class, $offset) && $this->$offset !== null;
+    return property_exists($this::class, $offset) && $this->$offset !== null;
   }
 
 
-  public function offsetGet($offset)
+  public function offsetGet($offset): mixed
   {
     return $this->$offset;
   }
 
 
-  public function offsetSet($offset, $value)
+  public function offsetSet($offset, $value): void
   {
     $this->$offset = $value;
   }
 
 
-  public function offsetUnset($offset)
+  public function offsetUnset($offset): void
   {
     $this->$offset = null;
   }
 
 
-  public function count()
+  public function count(): int
   {
     return count($this->getProperties());
   }
 
 
-  public function getIterator()
+  public function getIterator(): RecursiveArrayIterator
   {
-    return new \RecursiveArrayIterator($this->toArray());
+    return new RecursiveArrayIterator($this->toArray());
   }
 
 
   public function __get($name)
   {
-    $this->assertOptionDefined($name);
+    throw UndefinedOption::create($this::class, $name, $this->getProperties());
   }
 
 
   public function __set($name, $value)
   {
-    $this->assertOptionDefined($name);
-  }
-
-
-  private function assertOptionDefined(string $optionName): void
-  {
-    if (!property_exists(static::class, $optionName)) {
-      throw UndefinedOption::create(static::class, $optionName);
-    }
+    throw UndefinedOption::create($this::class, $name, $this->getProperties());
   }
 
 
@@ -126,17 +127,11 @@ abstract class Config implements \ArrayAccess, \Countable, \IteratorAggregate
    */
   private function getProperties(): array
   {
-    static $cachedProperties = null;
+    static $cachedProperties = [];
 
-    if (!isset($cachedProperties)) {
-      $cachedProperties = [];
-
-      $rf = new \ReflectionObject($this);
-      foreach ($rf->getProperties() as $property) {
-        $cachedProperties[] = $property->name;
-      }
-    }
-
-    return $cachedProperties;
+    return $cachedProperties[$this::class] ??= (fn(): array  => array_map(
+      fn(ReflectionProperty $rp): string => $rp->name,
+      (new ReflectionObject($this))->getProperties(~ReflectionProperty::IS_STATIC)
+    ))();
   }
 }

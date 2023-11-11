@@ -11,12 +11,12 @@ composer require lawondyss/config
 ```php
 class DbConfig extend Lawondyss\Config
 {
-  public $driver;
-  public $host;
-  public $database;
-  public $username;
-  public $password;
-  public $charset;
+  public string $driver;
+  public string $host;
+  public string $database;
+  public string $username;
+  public string $password;
+  public string $charset;
 }
 
 $dbConfig = DbConfig::fromArray([
@@ -29,7 +29,7 @@ $dbConfig = DbConfig::fromArray([
 ]);
 ```
 
-Simple call individual option.
+Simple get and set individual option.
 ```php
 $charset = $dbConfig->charset;
 $dbConfig->charset = 'latin1';
@@ -45,12 +45,12 @@ If you want default values, then defined in class.
 ```php
 class DbConfig extend Lawondyss\Config
 {
-  public $driver = 'mysqli';
-  public $host = 'localhost';
-  public $database;
-  public $username;
-  public $password;
-  public $charset = 'utf8';
+  public string $driver = 'mysqli';
+  public string $host = 'localhost';
+  public string $database;
+  public string $username;
+  public string $password;
+  public string $charset = 'utf8';
 }
 
 $defaultConfig = new DbConfig;
