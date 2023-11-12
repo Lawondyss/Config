@@ -48,7 +48,7 @@ abstract class Config implements ArrayAccess, Countable, IteratorAggregate
       if ($value instanceof self) {
         $value = $value->toArray();
       } elseif (is_array($value)) {
-        $value = array_map(fn(mixed $val) => $val instanceof Config ? $val->toArray() : $val, $value);
+        $value = array_map(static fn(mixed $val) => $val instanceof Config ? $val->toArray() : $val, $value);
       }
 
       $arr[$name] = $value;
@@ -60,7 +60,6 @@ abstract class Config implements ArrayAccess, Countable, IteratorAggregate
 
   /**
    * @param array<string, mixed> $options
-   * @return Config
    */
   public function withOptions(array $options): Config
   {
@@ -74,26 +73,34 @@ abstract class Config implements ArrayAccess, Countable, IteratorAggregate
   }
 
 
-  public function offsetExists($offset): bool
+  public function offsetExists(mixed $offset): bool
   {
+    $offset = (string)$offset;
+
     return property_exists($this::class, $offset) && $this->$offset !== null;
   }
 
 
-  public function offsetGet($offset): mixed
+  public function offsetGet(mixed $offset): mixed
   {
+    $offset = (string)$offset;
+
     return $this->$offset;
   }
 
 
-  public function offsetSet($offset, $value): void
+  public function offsetSet(mixed $offset, mixed $value): void
   {
+    $offset = (string) $offset;
+
     $this->$offset = $value;
   }
 
 
-  public function offsetUnset($offset): void
+  public function offsetUnset(mixed $offset): void
   {
+    $offset = (string)$offset;
+
     $this->$offset = null;
   }
 
@@ -110,13 +117,16 @@ abstract class Config implements ArrayAccess, Countable, IteratorAggregate
   }
 
 
-  public function __get($name)
+  public function __get(string $name): void
   {
     throw UndefinedOption::create($this::class, $name, $this->getProperties());
   }
 
 
-  public function __set($name, $value)
+  /**
+   * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+   */
+  public function __set(string $name, mixed $value): void
   {
     throw UndefinedOption::create($this::class, $name, $this->getProperties());
   }
@@ -129,9 +139,9 @@ abstract class Config implements ArrayAccess, Countable, IteratorAggregate
   {
     static $cachedProperties = [];
 
-    return $cachedProperties[$this::class] ??= (fn(): array  => array_map(
-      fn(ReflectionProperty $rp): string => $rp->name,
-      (new ReflectionObject($this))->getProperties(~ReflectionProperty::IS_STATIC)
+    return $cachedProperties[$this::class] ??= (static fn(): array  => array_map(
+        static fn(ReflectionProperty $rp): string => $rp->name,
+        (new ReflectionObject($this))->getProperties(~ReflectionProperty::IS_STATIC)
     ))();
   }
 }

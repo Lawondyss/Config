@@ -28,18 +28,23 @@ class UndefinedOption extends InvalidArgumentException
   }
 
 
+  /**
+   * @param string[] $possibilities
+   */
   private static function getSuggestion(array $possibilities, string $name): ?string
   {
     $best = null;
     $min = (strlen($name) / 4 + 1) * 10 + .1;
 
     foreach ($possibilities as $item) {
-      $len = levenshtein($item, $name, 10, 11, 10);
+      $lev = levenshtein($item, $name, 10, 11, 10);
 
-      if ($len > 0 && $len < $min) {
-        $min = $len;
-        $best = $item;
+      if ($lev <= 0 || $lev >= $min) {
+          continue;
       }
+
+      $min = $lev;
+      $best = $item;
     }
 
     return $best;
