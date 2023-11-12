@@ -139,7 +139,7 @@ abstract class Config implements ArrayAccess, Countable, IteratorAggregate
   {
     static $cachedProperties = [];
 
-    return $cachedProperties[$this::class] ??= (static fn(): array  => array_map(
+    return $cachedProperties[$this::class] ??= (fn(): array  => array_map(
         static fn(ReflectionProperty $rp): string => $rp->name,
         (new ReflectionObject($this))->getProperties(~ReflectionProperty::IS_STATIC)
     ))();

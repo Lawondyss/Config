@@ -3,7 +3,6 @@
   "description": "Base class for creating own class of configuration. Better than a associative array :-)",
   "type": "library",
   "license": "MIT",
-  "version": "2.0.0",
   "authors": [
     {
       "name": "Ladislav Vondráček",
