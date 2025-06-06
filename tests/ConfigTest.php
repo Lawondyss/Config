@@ -65,6 +65,18 @@ test('Undefined', function (): void {
   $config = new FooConfig;
   Assert::exception(fn() => $config->lipsum, UndefinedOption::class, 'Option FooConfig::$lipsum is not defined');
   Assert::exception(fn() => $config['lipsum'], UndefinedOption::class, 'Option FooConfig::$lipsum is not defined');
+
+  // Test setting undeclared property via fromArray
+  Assert::exception(fn() => FooConfig::fromArray(['undeclaredRandomProperty' => 'testValue']), UndefinedOption::class, 'Option FooConfig::$undeclaredRandomProperty is not defined');
+
+  // Test setting undeclared property via withOptions
+  Assert::exception(fn() => $config->withOptions(['anotherUndeclaredProperty' => 'testValue2']), UndefinedOption::class, 'Option FooConfig::$anotherUndeclaredProperty is not defined');
+
+  // Test setting undeclared property via array access
+  Assert::exception(fn() => $config['yetAnotherUndeclared'] = 'testValue3', UndefinedOption::class, 'Option FooConfig::$yetAnotherUndeclared is not defined');
+
+  // Test setting undeclared property via direct assignment
+  Assert::exception(fn() => $config->directUndeclaredSet = 'testValue4', UndefinedOption::class, 'Option FooConfig::$directUndeclaredSet is not defined');
 });
 
 test('Suggestion', function (): void {

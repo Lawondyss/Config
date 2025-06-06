@@ -1,0 +1,8 @@
+parameters:
+    level: 0
+    paths:
+        - src
+        - tests
+    # If bootstrap.php is needed for autoloading or constants for analysis (unlikely for level 0 on this project)
+    # bootstrapFiles:
+    #     - tests/bootstrap.php

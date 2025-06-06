@@ -12,6 +12,10 @@ use function strlen;
 
 class UndefinedOption extends InvalidArgumentException
 {
+  private static int $LEVENSHTEIN_COST_INS = 10;
+  private static int $LEVENSHTEIN_COST_DEL = 11;
+  private static int $LEVENSHTEIN_COST_REP = 10;
+
   /**
    * @param string[] $possibilities
    */
@@ -37,7 +41,7 @@ class UndefinedOption extends InvalidArgumentException
     $min = (strlen($name) / 4 + 1) * 10 + .1;
 
     foreach ($possibilities as $item) {
-      $lev = levenshtein($item, $name, 10, 11, 10);
+      $lev = levenshtein($item, $name, self::$LEVENSHTEIN_COST_INS, self::$LEVENSHTEIN_COST_DEL, self::$LEVENSHTEIN_COST_REP);
 
       if ($lev <= 0 || $lev >= $min) {
           continue;
